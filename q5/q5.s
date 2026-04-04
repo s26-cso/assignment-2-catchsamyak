@@ -1,6 +1,6 @@
 .section .rodata
 
-infilepath:                         #defining the input format
+infilepath:                         #defining the input filepath
 .string "input.txt"
 outfmt:                             #defining the output format
 .string "%s\n"
@@ -15,7 +15,7 @@ no:
 main:
 add sp, sp, -32                     #allocating sufficient space on stack (must be a multiple of 16)
 sd x1, 0(sp)                        #storing initial ra on stack
-sd x9, 8(sp)                        #storing old value of x9 on stack since x21 is a saved register
+sd x9, 8(sp)                        #storing old value of x9 on stack since x9 is a saved register
 
 addi x17, x0, 56                    #set sys call num as 56 which corresponds to openat
 addi x10, x0, -100                  #telling the os to look in the curr dir
@@ -23,7 +23,6 @@ lla x11, infilepath
 add x12, x0, x0                     #setting to read only    
 ecall                               
 add x9, x0, x10                     #x9 now contains fd (file descriptor)
-addi x5, sp, 8                      #addr in x5 contains start of string
 
 addi x17, x0, 62                    #set sys call num as 62 which corresponds to lseek
 add x10, x0, x9                     #giving the fd
@@ -31,7 +30,7 @@ add x11, x0, x0                     #setting offset to 0
 addi x12, x0, 2                     #measured from end of file    
 ecall                               
 add x7, x0, x10                     #x7 contains the length
-addi x7, x7, -1                     #x7 will now store the rp 
+addi x7, x7, -2                     #x7 will now store the rp, subtract another index to account for the \n 
 
 add x6, x0, x0                      #x6 stores the lp
 whileloop2:
@@ -87,7 +86,7 @@ finish:
 addi x17, x0, 57                    #set sys call num as 57 which corresponds to close
 add x10, x0, x9                     #giving the fd
 ecall 
-ld x9, 8(sp)                        #restoring old value of x18 from stack
+ld x9, 8(sp)                        #restoring old value of x9 from stack
 ld x1, 0(sp)                        #restoring initial ra from stack
 addi sp, sp, 32                     #restoring space on stack
 add x10, x0, x0                     #setting return value to 0
