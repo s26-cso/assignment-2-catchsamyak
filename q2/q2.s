@@ -35,10 +35,14 @@ addi x5, x5, 1                      #increment iterator
 jal x0, initforloop                 #call initforloop again
 
 endinitforloop:
+
+addi x31, x0, 45                    #x31 stores the ascii value of the '-' sign 
 addi x5, x0, 0                      #x5 stores the iterator i=0
-forloop:
+forloop:                            #forloop that converts each str to int
 bge x5, x18, endforloop             #branch to endforloop if i>=n
+#this runs if i<n
 addi x6, x5, 1                      #using i+1 to skip first arg (executable name)
+addi x29, x0, 1                     #stores sign
 slli x6, x6, 3                      #x6 now contains 8*i since each ptr is 8 bytes
 add x6, x6, x21                     #x6 now contains ptr to str[i]
 ld x6, 0(x6)                        #x6 now contains addr of str[i]
@@ -49,6 +53,12 @@ whileloop:
 add x28, x6, x7                     #x28 now contains the addr of str[i][j]
 lb x28, 0(x28)                      #x28 now contains the val at str[i][j]
 beq x28, x0, endwhileloop           #branch to endwhileloop if you reached the ending nullchar
+bne x28, x31, notneg                #branch to notneg if str[i][j] is not equal to '-'
+#this runs if number is negative
+addi x29, x0, -1                    #set sign to -
+addi x7, x7, 1                      #increment iterator j
+jal x0, whileloop                   #continue whileloop
+notneg:
 addi x28, x28, -48                  #x28 now contains correct numerical value since ascii value of '0' is 48
 addi x30, x0, 10
 mul x19, x19, x30                   #x19 = 10 * x19
@@ -57,6 +67,7 @@ addi x7, x7, 1                      #increment iterator j
 jal x0, whileloop                   #call whileloop again
 
 endwhileloop:
+mul x19, x19, x29                   #set the correct sign of the numerical value 
 slli x30, x5, 3                     #x20 now contains 8*i since each ptr is 8 bytes
 add x30, x30, x21                   #x20 now contains ptr to str[i]
 sd x19, 0(x30)                      #overwrite the memory location of str[i] with the int value of str[i]
