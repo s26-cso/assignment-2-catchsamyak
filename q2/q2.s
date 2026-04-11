@@ -1,7 +1,9 @@
 .section .rodata
                      
-outfmt:                             #defining the output format
-.string "%lld "                    
+space:                             #defining space string
+.string " "
+numfmt:                            #defining the number format
+.string "%lld"                    
 newline:
 .string "\n"
 
@@ -68,8 +70,8 @@ jal x0, whileloop                   #call whileloop again
 
 endwhileloop:
 mul x19, x19, x29                   #set the correct sign of the numerical value 
-slli x30, x5, 3                     #x20 now contains 8*i since each ptr is 8 bytes
-add x30, x30, x21                   #x20 now contains ptr to str[i]
+slli x30, x5, 3                     #x30 now contains 8*i since each ptr is 8 bytes
+add x30, x30, x21                   #x30 now contains ptr to str[i]
 sd x19, 0(x30)                      #overwrite the memory location of str[i] with the int value of str[i]
 addi x5, x5, 1                      #increment iterator i
 jal x0, forloop
@@ -124,7 +126,12 @@ add x19, x0, x0                     #x19 stores the iterator i=0
 printforloop:                       #for loop to print output arr
 bge x19, x18, endprintforloop       #branch to endprintforloop if i>=n
 #this runs if i<n
-lla x10, outfmt
+beq x19, x0, skipspace              #skip printing space if i==0
+lla x10, space                      #print space before element
+call printf
+
+skipspace:
+lla x10, numfmt                     #print the number
 slli x6, x19, 3                     #x6 now contains 8*i since each long long int takes 8 bytes
 add x6, x6, x20                     #x6 now contains addr of output[i]
 ld x11, 0(x6)                       #x11 now contains value of output[i]

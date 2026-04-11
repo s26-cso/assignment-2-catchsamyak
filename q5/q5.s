@@ -30,7 +30,27 @@ add x11, x0, x0                     #setting offset to 0
 addi x12, x0, 2                     #measured from end of file    
 ecall                               
 add x7, x0, x10                     #x7 contains the length
-addi x7, x7, -2                     #x7 will now store the rp, subtract another index to account for the \n 
+
+#move cursor to last char
+addi x17, x0, 62                    #set sys call num as 62 which corresponds to lseek
+add x10, x0, x9                     #giving the fd
+addi x11, x7, -1                    #setting offset to length - 1
+add x12, x0, x0                     #measured from start of file    
+ecall
+#read last char
+addi x17, x0, 63                    #set sys call num as 63 which corresponds to read
+add x10, x0, x9                     #giving the fd
+addi x11, sp, 16                    #location on stack where read value will be stored
+addi x12, x0, 1                     #since we want to read 1 byte   
+ecall
+
+lb x28, 16(sp)                      #x28 contains the last char
+addi x29, x0, 10                    #x29 contains ascii value of '\n'
+addi x7, x7, -1                     #x7 will now store the rp, if last char is not \n
+bne x28, x29, notnewline            #branch if last chat is not \n
+addi x7, x7, -1                     #subtract another index to account for the \n
+notnewline:
+#x7 will now store the final rp
 
 add x6, x0, x0                      #x6 stores the lp
 whileloop2:

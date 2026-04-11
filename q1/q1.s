@@ -65,7 +65,7 @@ sd x1, 0(sp)                        #storing initial ra on stack
 bne x10, x0, continue               #branch to continue if root is not null
 #this runs if root is null
 add x10, x0, x0
-# sd x1, 0(sp)                        #restoring initial ra from stack
+ld x1, 0(sp)                        #restoring initial ra from stack (although not required)
 addi sp, sp, 16                     #restoring space on stack
 jalr x0, 0(x1)
 
@@ -74,6 +74,7 @@ lw x5, 0(x10)                       #x5 now contains val of root
 bne x5, x11, continuefurther        #branch to continuefurther if val and val != val of root
 #this runs if they are equal
 addi sp, sp, 16                     #restoring space on stack
+ld x1, 0(sp)                        #restoring initial ra from stack (although not required)
 jalr x0, 0(x1)
 
 continuefurther:
@@ -105,7 +106,7 @@ lw x6, 0(x11)                       #x6 now contains val of root
 blt x10, x6, else                   #branch to else if val < val of root
 add x5, x0, x11                     #mark root as a possible predecessor
 beq x6, x10, endwhileloop           #branch to endwhileloop if val is equal to val of root
-#this runs if val < val of root 
+#this runs if val > val of root 
 ld x11, 16(x11)                     #set root as roots right child to check for a larger predecessor
 jal x0, whileloop                   #call whileloop again
 
