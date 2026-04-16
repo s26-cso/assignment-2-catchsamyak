@@ -73,8 +73,8 @@ continue:
 lw x5, 0(x10)                       #x5 now contains val of root
 bne x5, x11, continuefurther        #branch to continuefurther if val and val != val of root
 #this runs if they are equal
-addi sp, sp, 16                     #restoring space on stack
 ld x1, 0(sp)                        #restoring initial ra from stack (although not required)
+addi sp, sp, 16                     #restoring space on stack
 jalr x0, 0(x1)
 
 continuefurther:
